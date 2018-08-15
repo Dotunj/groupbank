@@ -13,5 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('/user', 'UserController@signup');
-Route::post('/user/login', 'UserController@signin');
+Route::prefix('v1')->group(function () {
+Route::post('/register', 'UserController@register');
+Route::post('/login', 'UserController@login');
+Route::post('/plan/create', 'PlanController@create');
+});

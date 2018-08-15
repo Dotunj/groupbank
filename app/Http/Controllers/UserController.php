@@ -4,18 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
+use Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class UserController extends Controller
 {
-   public function signup(Request $request)
+   public function register(Request $request)
    {
-       $this->validate($request, [
+       $rules = [
            'name'=>'required',
            'email'=>'required|email|unique:users',
            'password'=>'required'
-       ]);
+       ];
+
+       $validator = Validator::make($request->all(), $rules);
+         if($validator->fails()){
+             return response()->json(['error'=>$validator->messages()]);
+         }
 
        $user = new User([
            'name'=>$request->name,
@@ -25,14 +32,18 @@ class UserController extends Controller
       $user->save();
       return response()->json(['status'=>'successfully created user!'], 201);
    }
-
-   public function signin(Request $request)
+   
+   public function login(Request $request)
    {
-       $this->validate($request, [
-           'name'=>'required',
-           'email'=>'required|email',
-           'password'=>'required'
-       ]);
+    $rules = [
+        'email'=>'required|email',
+        'password'=>'required'
+    ];
+
+    $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()){
+          return response()->json(['error'=>$validator->messages()]);
+      }
        $credentials = $request->only('email', 'password');
        try{
           if(!$token = JWTAuth::attempt($credentials)){
@@ -43,4 +54,5 @@ class UserController extends Controller
        }
        return response()->json(['token'=> $token], 200);
    }
+
 }
