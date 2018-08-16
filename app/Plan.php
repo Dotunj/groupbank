@@ -11,8 +11,14 @@ class Plan extends Model
 
     protected $fillable = [
         'name',
+        'user_id',
         'amount',
         'date_of_collection'
     ];
+
+    public function schedule()
+    {
+        return $this->hasOne(Schedule::class);
+    }
     
 }

@@ -10,6 +10,14 @@ use JWTAuth;
 
 class PlanController extends Controller
 {
+    public function index()
+    {
+        $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
+
+        $plans = Plan::where('user_id', $user->id)->latest()->get();
+
+        return response()->json(['data'=>$plans, 'status'=>'successfully retrieved plans'], 200);
+    }
     public function create(Request $request)
     {
        $rules =  [
@@ -30,11 +38,16 @@ class PlanController extends Controller
            'name'=>$request->name,
            'amount'=>$request->amount,
            'user_id'=>$user->id,
-           'date_of_collection'=>$request->date_of_collection
        ]);
 
        $plan->save();
+       
+       //create a schedule for the plan
+       $plan->schedule()->create([
+           'plan_id' => $plan->id,
+           'start_date' => $request->date_of_collection
+       ]);
 
-       return response()->json(['data'=>$user, 'status'=>'successfully created plan!'], 201);
+       return response()->json(['data'=>$plan, 'status'=>'successfully created plan!'], 201);
     }
 }
