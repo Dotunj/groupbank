@@ -20,6 +20,7 @@ Route::post('/login', 'UserController@login');
 Route::group(['prefix'=>'account', 'middleware'=>'jwt.auth'], function() {
 Route::get('/plans', 'PlanController@index');
 Route::post('/plan/create', 'PlanController@create');
+Route::post('/plan/members/add', 'PlanController@addMemberToPlan');
 });
 
 });

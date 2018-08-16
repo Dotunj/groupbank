@@ -7,6 +7,8 @@ use App\Plan;
 use Validator;
 use Auth;
 use JWTAuth;
+use Mail;
+use App\Mail\PlanMember;
 
 class PlanController extends Controller
 {
@@ -49,5 +51,36 @@ class PlanController extends Controller
        ]);
 
        return response()->json(['data'=>$plan, 'status'=>'successfully created plan!'], 201);
+    }
+
+    public function addMemberToPlan(Request $request)
+    {
+        $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
+
+        $creator_name = $user->name; //fetch the name of the user creating the plan
+
+        $email = $request->email;
+
+       // dd($email);
+
+        $rules = [
+            'name'=> 'required',
+            'email'=> 'required|email'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if($validator->fails()){
+            return response()->json(['error'=>$validator->messages()]);
+        }
+
+        Mail::to($email)->send(new PlanMember($creator_name));
+
+        return response()->json(['status'=>'successfully sent mail'], 200);
+
+    }
+
+    public function addMembersToPlanForm()
+    {
+        return view('auth.register');
     }
 }
