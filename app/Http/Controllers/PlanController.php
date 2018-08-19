@@ -20,7 +20,13 @@ class PlanController extends Controller
 
         $plans = Plan::where('user_id', $user->id)->latest()->get();
 
-        return response()->json(['data'=>$plans, 'status'=>'successfully retrieved plans'], 200);
+        $result = [
+            'status'=>true,
+            'message'=>'successfully retrieved plans',
+            'data'=>$plans, 
+        ];
+
+        return response()->json($result, 200);
     }
     public function create(Request $request)
     {
@@ -52,7 +58,13 @@ class PlanController extends Controller
            'start_date' => $request->start_date
        ]);
 
-       return response()->json(['data'=>$plan, 'status'=>'successfully created plan!'], 201);
+       $result = [
+           'status'=>true,
+           'message'=>'successfully created plan',
+           'data'=>$plan,
+       ];
+
+       return response()->json($result, 201);
     }
 
     public function sendUserEmail(Request $request, Plan $plan)
@@ -71,13 +83,18 @@ class PlanController extends Controller
             return response()->json(['error'=>$validator->messages()]);
         }
 
-        if($this->memberEmailExists($email)){
+        if($this->userEmailExists($email)){
             Mail::to($email)->send(new PlanMember($user, $plan));
         } else {
             Mail::to($email)->send(new UserPlanMember($user, $plan));
         }
 
-        return response()->json(['status'=>'successfully sent mail'], 200);
+        $result = [
+            'status'=>true,
+            'message'=>'successfully sent mail',
+        ];
+
+        return response()->json($result, 200);
 
     }
 
@@ -87,7 +104,44 @@ class PlanController extends Controller
         return view('auth.register', compact('plan'));
     }
 
-    private function memberEmailExists($email)  //function to check if user email exists
+    public function subscribeNewUserToPlan(Request $request, Plan $plan)
+    {
+       //register new user and subscribe user to plan
+       $rules = [
+        'name'=>'required',
+        'email'=>'required|email|unique:users',
+        'password'=>'required'
+      ];
+
+     $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()){
+          return response()->json(['error'=>$validator->messages()]);
+        }
+
+        $user = new User([
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'password'=>bcrypt($request->password)      
+         ]);
+       $user->save();
+
+       $user->plans()->attach([$plan->id]);
+
+       $result = [
+           'status'=>true,
+           'message'=>'successfully created user and subscribed to plan!',
+           'data'=>$user,
+       ];
+
+       return response()->json($result, 201);
+    }
+
+    public function subscribeRegisteredUserToPlan(Plan $plan)
+    {
+        
+    }
+
+    private function userEmailExists($email)  //function to check if user email exists
     {
         if(User::where('email', $email)->exists()){
             return true;

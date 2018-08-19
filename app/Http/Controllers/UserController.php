@@ -30,7 +30,14 @@ class UserController extends Controller
            'password'=>bcrypt($request->password)      
         ]);
       $user->save();
-      return response()->json(['status'=>'successfully created user!'], 201);
+
+      $result = [
+          'status'=>true,
+          'message'=>'successfully created user!',
+          'data'=>$user,
+      ];
+
+      return response()->json($result, 201);
    }
    
    public function login(Request $request)
@@ -52,7 +59,15 @@ class UserController extends Controller
        }catch (JWTException $e){
            return response()->json(['error'=>'Could not create token!'], 500);
        }
-       return response()->json(['token'=> $token], 200);
-   }
+
+       $result = [
+        'status'=>true,
+        'message'=>'successfully logged in user!',
+        'token'=>$token,
+       ];
+       
+       return response()->json($result, 200);
+   
+    }
 
 }

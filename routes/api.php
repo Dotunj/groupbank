@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::group(['prefix'=>'v1'], function() {
 Route::post('/register', 'UserController@register');
 Route::post('/login', 'UserController@login');
+Route::post('/plan/{plan}/user/register', 'PlanController@subscribeNewUserToPlan')->name('add.new.user.to.plan');
 
 Route::group(['prefix'=>'account', 'middleware'=>'jwt.auth'], function() {
 Route::get('/plans', 'PlanController@index');
