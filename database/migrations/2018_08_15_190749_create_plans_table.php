@@ -16,6 +16,7 @@ class CreatePlansTable extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index();
+            $table->string('identifier')->unique();
             $table->string('name');
             $table->decimal('amount', 13, 4);
             $table->softDeletes();

@@ -25,7 +25,7 @@ class PlanController extends Controller
        $rules =  [
             'name'=>'required',
             'amount'=>'required|numeric',
-            'date_of_collection'=>'required' 
+            'start_date'=>'required' 
        ];
 
        $validator = Validator::make($request->all(), $rules);
@@ -47,7 +47,7 @@ class PlanController extends Controller
        //create a schedule for the plan
        $plan->schedule()->create([
            'plan_id' => $plan->id,
-           'start_date' => $request->date_of_collection
+           'start_date' => $request->start_date
        ]);
 
        return response()->json(['data'=>$plan, 'status'=>'successfully created plan!'], 201);

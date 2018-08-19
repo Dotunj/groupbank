@@ -16,6 +16,20 @@ class Plan extends Model
         'date_of_collection'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($plan) {
+            $plan->identifier = uniqid(true);
+        });
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'identifier';
+    }
+
     public function schedule()
     {
         return $this->hasOne(Schedule::class);
