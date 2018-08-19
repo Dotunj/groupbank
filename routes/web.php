@@ -14,4 +14,4 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/plan/{plan}','PlanController@addMembersToPlanForm');
+Route::get('/plan/{plan}/register','PlanController@addMembersToPlanForm')->name('add.user.plan');

@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Plan;
+use App\User;
 use Validator;
 use Auth;
 use JWTAuth;
 use Mail;
 use App\Mail\PlanMember;
+use App\Mail\UserPlanMember;
 
 class PlanController extends Controller
 {
@@ -57,11 +59,7 @@ class PlanController extends Controller
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
-        //$creator_name = $user->name; //fetch the name of the user creating the plan
-
         $email = $request->email;
-
-       // dd($email);
 
         $rules = [
             'name'=> 'required',
@@ -73,7 +71,11 @@ class PlanController extends Controller
             return response()->json(['error'=>$validator->messages()]);
         }
 
-        Mail::to($email)->send(new PlanMember($user, $plan));
+        if($this->memberEmailExists($email)){
+            Mail::to($email)->send(new PlanMember($user, $plan));
+        } else {
+            Mail::to($email)->send(new UserPlanMember($user, $plan));
+        }
 
         return response()->json(['status'=>'successfully sent mail'], 200);
 
@@ -82,5 +84,12 @@ class PlanController extends Controller
     public function addMembersToPlanForm(Plan $plan)
     {
         return view('auth.register', compact('plan'));
+    }
+
+    private function memberEmailExists($email)  //function to check if user email exists
+    {
+        if(User::where('email', $email)->exists()){
+            return true;
+        }
     }
 }

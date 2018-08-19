@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class PlanMember extends Mailable
+class UserPlanMember extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -35,6 +35,6 @@ class PlanMember extends Mailable
     public function build()
     {
        return $this->from('no-reply@groupbank.co')
-                   ->view('emails.plan.newplanmember');
+                   ->view('emails.plan.newuserplanmember');
     }
 }
