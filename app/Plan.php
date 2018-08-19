@@ -13,7 +13,6 @@ class Plan extends Model
         'name',
         'user_id',
         'amount',
-        'date_of_collection'
     ];
 
     public static function boot()
@@ -35,9 +34,9 @@ class Plan extends Model
         return $this->hasOne(Schedule::class);
     }
 
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class);
     }
     
 }

@@ -55,7 +55,7 @@ class PlanController extends Controller
        return response()->json(['data'=>$plan, 'status'=>'successfully created plan!'], 201);
     }
 
-    public function addMemberToPlan(Request $request, Plan $plan)
+    public function sendUserEmail(Request $request, Plan $plan)
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
@@ -83,6 +83,7 @@ class PlanController extends Controller
 
     public function addMembersToPlanForm(Plan $plan)
     {
+
         return view('auth.register', compact('plan'));
     }
 
