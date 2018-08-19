@@ -17,11 +17,14 @@ class PlanMember extends Mailable
      * @return void
      */
 
-    public $creator_name;
+    public $user;
 
-    public function __construct($creator_name)
+    public $plan;
+
+    public function __construct($user, $plan)
     {
-        $this->creator_name = $creator_name;
+        $this->user = $user;
+        $this->plan = $plan;
     }
 
     /**

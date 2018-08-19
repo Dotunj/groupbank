@@ -34,5 +34,10 @@ class Plan extends Model
     {
         return $this->hasOne(Schedule::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     
 }

@@ -53,11 +53,11 @@ class PlanController extends Controller
        return response()->json(['data'=>$plan, 'status'=>'successfully created plan!'], 201);
     }
 
-    public function addMemberToPlan(Request $request)
+    public function addMemberToPlan(Request $request, Plan $plan)
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
-        $creator_name = $user->name; //fetch the name of the user creating the plan
+        //$creator_name = $user->name; //fetch the name of the user creating the plan
 
         $email = $request->email;
 
@@ -73,14 +73,14 @@ class PlanController extends Controller
             return response()->json(['error'=>$validator->messages()]);
         }
 
-        Mail::to($email)->send(new PlanMember($creator_name));
+        Mail::to($email)->send(new PlanMember($user, $plan));
 
         return response()->json(['status'=>'successfully sent mail'], 200);
 
     }
 
-    public function addMembersToPlanForm()
+    public function addMembersToPlanForm(Plan $plan)
     {
-        return view('auth.register');
+        return view('auth.register', compact('plan'));
     }
 }
