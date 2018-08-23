@@ -21,7 +21,8 @@ Route::post('/plan/{plan}/user/register', 'PlanController@subscribeNewUserToPlan
 Route::group(['prefix'=>'account', 'middleware'=>'jwt.auth'], function() {
 Route::get('/plans', 'PlanController@index');
 Route::post('/plan/create', 'PlanController@create');
-Route::post('/plan/{plan}/members/add', 'PlanController@sendUserEmail');
+Route::post('/plan/{plan}/users/add', 'PlanController@sendUserEmail');
+Route::post('/plan/{plan}/subscribe', 'PlanController@subscribeRegisteredUserToPlan');
 });
 
 });

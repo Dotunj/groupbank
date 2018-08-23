@@ -138,7 +138,17 @@ class PlanController extends Controller
 
     public function subscribeRegisteredUserToPlan(Plan $plan)
     {
+        $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
+
+        $user->plans()->attach([$plan->id]);
+
+        $result = [
+            'status'=>true,
+            'message'=>'successfully subscribed user to plan',
+            'data'=>$user
+        ];
         
+        return response()->json($result, 201);
     }
 
     private function userEmailExists($email)  //function to check if user email exists
