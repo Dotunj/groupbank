@@ -11,6 +11,7 @@ use JWTAuth;
 use Mail;
 use App\Mail\PlanMember;
 use App\Mail\UserPlanMember;
+use App\Http\Controllers\PaymentController as Payment;
 
 class PlanController extends Controller
 {
@@ -104,9 +105,9 @@ class PlanController extends Controller
         return view('auth.register', compact('plan'));
     }
 
-    public function subscribeNewUserToPlan(Request $request, Plan $plan)
+    public function registerNewUser(Request $request, Plan $plan)
     {
-       //register new user and subscribe user to plan
+       //register new user 
        $rules = [
         'name'=>'required',
         'email'=>'required|email|unique:users',
@@ -125,22 +126,41 @@ class PlanController extends Controller
          ]);
        $user->save();
 
-       $user->plans()->attach([$plan->id]);
-
        $result = [
            'status'=>true,
-           'message'=>'successfully created user and subscribed to plan!',
+           'message'=>'successfully created user!',
            'data'=>$user,
        ];
 
        return response()->json($result, 201);
     }
 
-    public function subscribeRegisteredUserToPlan(Plan $plan)
+    public function subscribeNewUserToPlan(Plan $plan, $TnxRef)
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
-        $user->plans()->attach([$plan->id]);
+        $payment = new Payment();
+
+        $result = $payment->verifyTransaction($TnxRef); //charge user's card
+
+        $card_details= [
+            'user_id'=> $user->id,
+            'auth_code'=> $result['data']['authorization']['authorization_code'],
+            'bin'=> $result['data']['authorization']['bin'],
+            'last_four'=> $result['data']['authorization']['last4'],
+            'card_type'=>$result['data']['authorization']['card_type'] 
+        ];
+
+        $card = $user->cards()->create($card_details); //store user's card to the DB
+
+        //subscribe the user to the plan
+        $user->subscriptions()->create([
+             'user_id'=> $user->id,
+             'plan_id'=>$plan->id,
+             'card_id'=>$card->id
+        ]);
+       
+       $user->plans()->attach([$plan->id]);
 
         $result = [
             'status'=>true,
@@ -148,7 +168,7 @@ class PlanController extends Controller
             'data'=>$user
         ];
         
-        return response()->json($result, 201);
+        return response()->json($result, 200);
     }
 
     private function userEmailExists($email)  //function to check if user email exists
@@ -156,5 +176,10 @@ class PlanController extends Controller
         if(User::where('email', $email)->exists()){
             return true;
         }
+    }
+
+    public function test()
+    {
+        return view('test');
     }
 }

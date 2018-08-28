@@ -43,4 +43,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Plan::class);
     }
 
+    public function cards()
+    {
+        return $this->hasMany(Card::class);
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
 }

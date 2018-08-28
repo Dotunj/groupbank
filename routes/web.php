@@ -15,3 +15,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/plan/{plan}/register','PlanController@addMembersToPlanForm')->name('add.user.plan');
+Route::get('/test/payment', 'PlanController@test');

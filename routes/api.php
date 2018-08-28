@@ -16,13 +16,14 @@ use Illuminate\Http\Request;
 Route::group(['prefix'=>'v1'], function() {
 Route::post('/register', 'UserController@register');
 Route::post('/login', 'UserController@login');
-Route::post('/plan/{plan}/user/register', 'PlanController@subscribeNewUserToPlan')->name('add.new.user.to.plan');
+//Route::post('/plan/{plan}/user/register', 'PlanController@subscribeNewUserToPlan')->name('add.new.user.to.plan');
 
 Route::group(['prefix'=>'account', 'middleware'=>'jwt.auth'], function() {
 Route::get('/plans', 'PlanController@index');
 Route::post('/plan/create', 'PlanController@create');
 Route::post('/plan/{plan}/users/add', 'PlanController@sendUserEmail');
-Route::post('/plan/{plan}/subscribe', 'PlanController@subscribeRegisteredUserToPlan');
+Route::post('/plan/{plan}/register', 'PlanController@registerNewUser');
+Route::get('/plan/{plan}/subscribe/{TnxRef}', 'PlanController@subscribeNewUserToPlan');
 });
 
 });
