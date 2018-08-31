@@ -21,9 +21,10 @@ Route::post('/login', 'UserController@login');
 Route::group(['prefix'=>'account', 'middleware'=>'jwt.auth'], function() {
 Route::get('/plans', 'PlanController@index');
 Route::post('/plan/create', 'PlanController@create');
-Route::post('/plan/{plan}/users/add', 'PlanController@sendUserEmail');
 Route::post('/plan/{plan}/register', 'PlanController@registerNewUser');
-Route::get('/plan/{plan}/subscribe/{TnxRef}', 'PlanController@subscribeNewUserToPlan');
+Route::post('/plan/{plan}/users/add', 'PlanController@sendUserEmail');
+Route::post('/plan/{plan}/subscribe/{TnxRef}', 'PlanController@subscribeNewUserToPlan');
+
 });
 
 });

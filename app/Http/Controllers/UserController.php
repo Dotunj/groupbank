@@ -21,7 +21,7 @@ class UserController extends Controller
 
        $validator = Validator::make($request->all(), $rules);
          if($validator->fails()){
-             return response()->json(['error'=>$validator->messages()]);
+             return response()->json($validator->messages());
          }
 
        $user = new User([
@@ -49,12 +49,12 @@ class UserController extends Controller
 
     $validator = Validator::make($request->all(), $rules);
       if($validator->fails()){
-          return response()->json(['error'=>$validator->messages()]);
+          return response()->json($validator->messages());
       }
        $credentials = $request->only('email', 'password');
        try{
           if(!$token = JWTAuth::attempt($credentials)){
-              return response()->json(['error'=>'Invalid Credentials!'], 401);
+              return response()->json(['message'=>'Email or Password is incorrect!'], 401);
           }
        }catch (JWTException $e){
            return response()->json(['error'=>'Could not create token!'], 500);

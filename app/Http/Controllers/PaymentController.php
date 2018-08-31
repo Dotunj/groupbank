@@ -20,8 +20,6 @@ class PaymentController extends Controller
         $this->base_url = getenv('PAYSTACK_PAYMENT_URL');
 
         $this->secret_key = getenv('PAYSTACK_SECRET_KEY');
-        
-       // dd($this->base_url);
 
         $this->setClient();
     }
@@ -40,7 +38,7 @@ class PaymentController extends Controller
     }
 
 
-    public function verifyTransaction($TnxRef)
+    public static function verifyTransaction($TnxRef)
     {
         $result = array();
 
@@ -78,5 +76,39 @@ class PaymentController extends Controller
         $result =json_decode($body,true);
 
         dd($result);
+    }
+
+    public function fetchAllBanks()
+    {
+        $result = array();
+
+        $response = $this->client->request('GET', '/bank');
+
+        $body = $response->getBody();
+
+        $result =json_decode($body,true);
+
+        $test = $this->addAccountNumber(3113379106, "011");
+
+        return $test;
+    }
+
+    public function addAccountNumber($acct_no, $bank_code)
+    {
+        $result = array();
+
+      //  dd($bank_code);
+
+        //$acct_no = 3113379106;
+
+        //$bank_code = 011;
+
+        $response = $this->client->request('GET', '/bank/resolve?account_number='. $acct_no .'&bank_code='.$bank_code);
+
+        $body = $response->getBody();
+
+        $result =json_decode($body,true);
+
+        return $result; 
     }
 }

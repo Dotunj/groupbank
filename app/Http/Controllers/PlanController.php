@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Plan;
 use App\User;
+use App\Plan;
 use Validator;
 use Auth;
 use JWTAuth;
@@ -44,15 +44,17 @@ class PlanController extends Controller
 
        $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
+       if($user->hasNoCards() == true){
+           return response()->json(['message'=>'You need to add a card first before you can create a plan']);
+       }else{
        //creates a new plan for a user
        $plan = new Plan([
            'name'=>$request->name,
            'amount'=>$request->amount,
            'user_id'=>$user->id,
        ]);
-
        $plan->save();
-       
+       }
        //create a schedule for the plan
        $plan->schedule()->create([
            'plan_id' => $plan->id,
@@ -137,11 +139,21 @@ class PlanController extends Controller
 
     public function subscribeNewUserToPlan(Plan $plan, $TnxRef)
     {
+        dd($plan);
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
         $payment = new Payment();
 
         $result = $payment->verifyTransaction($TnxRef); //charge user's card
+
+        dd($result);
+
+        if($user->hasNoCard() == true)
+        {
+         dd('user has no card');
+        }else {
+            dd('user has card');
+        }
 
         $card_details= [
             'user_id'=> $user->id,
@@ -167,6 +179,7 @@ class PlanController extends Controller
             'message'=>'successfully subscribed user to plan',
             'data'=>$user
         ];
+
         
         return response()->json($result, 200);
     }
@@ -180,6 +193,9 @@ class PlanController extends Controller
 
     public function test()
     {
-        return view('test');
+     //   $result = Payment::verifyTransaction("un1s0nebn9e0wsw"); //charge user's card
+
+       // dd($result);
+
     }
 }
