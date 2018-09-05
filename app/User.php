@@ -53,9 +53,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Subscription::class);
     }
 
-    public function hasNoCard()
+    public function hasCard()
     {
-        if(!count($this->cards)){
+        if(count($this->cards)){
             return true;
           }else {
             return false;

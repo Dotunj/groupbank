@@ -148,13 +148,6 @@ class PlanController extends Controller
 
         dd($result);
 
-        if($user->hasNoCard() == true)
-        {
-         dd('user has no card');
-        }else {
-            dd('user has card');
-        }
-
         $card_details= [
             'user_id'=> $user->id,
             'auth_code'=> $result['data']['authorization']['authorization_code'],
@@ -191,11 +184,4 @@ class PlanController extends Controller
         }
     }
 
-    public function test()
-    {
-     //   $result = Payment::verifyTransaction("un1s0nebn9e0wsw"); //charge user's card
-
-       // dd($result);
-
-    }
 }

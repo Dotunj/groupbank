@@ -38,7 +38,7 @@ class PaymentController extends Controller
     }
 
 
-    public static function verifyTransaction($TnxRef)
+    public function verifyTransaction($TnxRef)
     {
         $result = array();
 

@@ -36,8 +36,8 @@ class UserController extends Controller
           'message'=>'successfully created user!',
           'data'=>$user,
       ];
-
-      return response()->json($result, 201);
+       
+      return $this->login($request);
    }
    
    public function login(Request $request)
@@ -54,7 +54,7 @@ class UserController extends Controller
        $credentials = $request->only('email', 'password');
        try{
           if(!$token = JWTAuth::attempt($credentials)){
-              return response()->json(['message'=>'Email or Password is incorrect!'], 401);
+              return response()->json(['message'=>'Invalid Credentials!'], 401);
           }
        }catch (JWTException $e){
            return response()->json(['error'=>'Could not create token!'], 500);
@@ -68,6 +68,36 @@ class UserController extends Controller
        
        return response()->json($result, 200);
    
+    }
+
+    public function fetchUser()
+    {
+        $user = JWTAuth::parseToken()->toUser(); 
+
+        $user_has_card = $user->hasCard(); //check if the user has a card or not
+
+        $result = [
+            'status'=>true,
+            'message'=>'successfull',
+            'data' => $user,
+            'user_has_card'=>$user_has_card 
+        ];
+
+        return response()->json($result, 200);
+
+    }
+
+    public function logout(Request $request)
+    {
+         $this->validate($request, ['token'=> 'required']);
+
+         try{
+             JWTAuth::invalidate($request->input('token'));
+             return response()->json(['success'=>true, 'message'=>"You have successfully logged out"]);
+         } catch (JWTException $e) {
+             //something went wrong while attempting to encode the token
+             return response()->json(['success'=>false, 'message'=>'Failed to logout, please try again'], 500);
+         }
     }
 
 }
