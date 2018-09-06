@@ -23,6 +23,8 @@ Route::post('/logout', 'UserController@logout');
 Route::group(['prefix'=>'account', 'middleware'=>'jwt.auth'], function() {
 Route::get('/user', 'UserController@fetchUser');
 Route::post('/user/add/card/{TnxRef}', 'CardController@addCard');
+Route::get('/user/cards', 'CardController@allCards');
+Route::delete('/user/card/delete/{id}', 'CardController@deleteCard');
 Route::get('/plans', 'PlanController@index');
 Route::post('/plan/create', 'PlanController@create');
 Route::post('/plan/{plan}/register', 'PlanController@registerNewUser');

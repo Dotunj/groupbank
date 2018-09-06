@@ -27,4 +27,9 @@ class Card extends Model
         $this->hasMany(Subscription::class);
     }
 
+    public function scopeuserCards($query, $value)
+    {
+        return $query->where('user_id', $value);
+    }
+
 }

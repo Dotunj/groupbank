@@ -38,4 +38,36 @@ class CardController extends Controller
         return response()->json($result, 201);
 
     }
+
+    public function allCards()
+    {
+        $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
+
+        $user_cards = $user->cards()->get(['id', 'last_four', 'card_type']); //fetch only specific columns from the card table
+        
+        $result = [
+            'status'=>true,
+            'message'=>'Retrieved all cards',
+            'data'=>$user_cards 
+        ];
+
+        return response()->json($result, 200);
+
+    }
+
+    public function deleteCard($id)
+    {
+        $card = Card::findorFail($id);
+
+        $this->authorize('touch', $card);
+
+        $card->delete();
+
+        $result = [
+            'status'=>true,
+            'message'=>'Card has been deleted',
+        ];
+
+        return response()->json($result, 200);
+    }
 }
