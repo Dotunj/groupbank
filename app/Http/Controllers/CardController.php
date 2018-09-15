@@ -13,8 +13,6 @@ class CardController extends Controller
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
-        // dd($user->hasCard());
-
         $payment = new Payment();
 
         $results = $payment->verifyTransaction($TnxRef); //charge user's card
@@ -26,16 +24,33 @@ class CardController extends Controller
             'last_four'=> $results['data']['authorization']['last4'],
             'card_type'=>$results['data']['authorization']['card_type'] 
         ];
+       
+        $last_four = $card_details['last_four'];
+        $auth_code = $card_details['auth_code'];
 
+        $card_exists = Card::where('last_four', $last_four) //query to check if user card already exists
+                            ->where('user_id', $user->id)
+                            ->whereNull('deleted_at')
+                            ->exists();
+         
+        if($card_exists){
+            $result = [
+                'status'=>true,
+                'message'=>'Card has already been added',
+            ];
+           
+            return response()->json($result, 200);
+        } else{
         $card = $user->cards()->create($card_details); //store user's card to the DB
     
-        $result = [
-            'status'=>true,
-            'message'=>'Card has been added successfully',
-            'data'=>$card
-        ];
-       
+            $result = [
+                'status'=>true,
+                'message'=>'Card has been added successfully',
+                'data'=>$card
+            ];
+           
         return response()->json($result, 201);
+        }
 
     }
 
@@ -70,4 +85,5 @@ class CardController extends Controller
 
         return response()->json($result, 200);
     }
+
 }

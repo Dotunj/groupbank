@@ -17,6 +17,8 @@ class Card extends Model
         'card_type',
     ];
 
+    protected $dates = ['deleted_at'];
+
     public function user()
     {
         $this->belongsTo(User::class);

@@ -44,7 +44,7 @@ class PlanController extends Controller
 
        $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
-       if($user->hasNoCards() == true){
+       if(!$user->hasCard()){
            return response()->json(['message'=>'You need to add a card first before you can create a plan']);
        }else{
        //creates a new plan for a user
@@ -63,7 +63,7 @@ class PlanController extends Controller
 
        $result = [
            'status'=>true,
-           'message'=>'successfully created plan',
+           'message'=>'Plan created Successfully',
            'data'=>$plan,
        ];
 
@@ -77,7 +77,6 @@ class PlanController extends Controller
         $email = $request->email;
 
         $rules = [
-            'name'=> 'required',
             'email'=> 'required|email'
         ];
 
@@ -94,7 +93,7 @@ class PlanController extends Controller
 
         $result = [
             'status'=>true,
-            'message'=>'successfully sent mail',
+            'message'=>'Mail sent successfully',
         ];
 
         return response()->json($result, 200);
