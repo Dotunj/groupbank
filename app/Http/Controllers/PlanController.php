@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Plan;
+use App\Card;
+use App\Subscription;
 use Validator;
 use Auth;
 use JWTAuth;
@@ -15,7 +17,8 @@ use App\Http\Controllers\PaymentController as Payment;
 
 class PlanController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
@@ -25,7 +28,9 @@ class PlanController extends Controller
             'status'=>true,
             'message'=>'successfully retrieved plans',
             'data'=>$plans, 
-        ];
+        ];        
+
+        dd($plans->subscriptions);
 
         return response()->json($result, 200);
     }
@@ -55,10 +60,20 @@ class PlanController extends Controller
        ]);
        $plan->save();
        }
+
        //create a schedule for the plan
        $plan->schedule()->create([
            'plan_id' => $plan->id,
            'start_date' => $request->start_date
+       ]);
+
+       //fetch user card 
+       $card_id = Card::where('user_id', $user->id)->first()->get(['id']);
+
+       $plan->subscription()->create([
+          'user_id'=>$user->id,
+          'plan_id'=>$plan->id,
+          'card_id'=>$card_id,       
        ]);
 
        $result = [
@@ -127,6 +142,8 @@ class PlanController extends Controller
          ]);
        $user->save();
 
+       $user->plans()->attach([$plan->id]);
+
        $result = [
            'status'=>true,
            'message'=>'successfully created user!',
@@ -138,14 +155,14 @@ class PlanController extends Controller
 
     public function subscribeNewUserToPlan(Plan $plan, $TnxRef)
     {
-        dd($plan);
+        //dd($plan);
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
         $payment = new Payment();
 
         $result = $payment->verifyTransaction($TnxRef); //charge user's card
 
-        dd($result);
+       // dd($result);
 
         $card_details= [
             'user_id'=> $user->id,
@@ -157,23 +174,45 @@ class PlanController extends Controller
 
         $card = $user->cards()->create($card_details); //store user's card to the DB
 
-        //subscribe the user to the plan
+
+        //subscribe the user to the plan 
         $user->subscriptions()->create([
              'user_id'=> $user->id,
              'plan_id'=>$plan->id,
              'card_id'=>$card->id
         ]);
-       
-       $user->plans()->attach([$plan->id]);
 
         $result = [
             'status'=>true,
-            'message'=>'successfully subscribed user to plan',
+            'message'=>'Youve been subscribed to the plan successfully',
             'data'=>$user
         ];
 
         
         return response()->json($result, 200);
+    }
+
+    public function fetchAllSubscribedUsersToAPlan(Plan $plan) //fetch all users subscribed to a plan
+    {
+        $this->authorize('touch', $plan);
+
+        $subscribed_users = Subscription::where('plan_id', $plan->id)->get();
+
+        foreach($subscribed_users as $subscription){
+            echo $subscription->user->email;
+        }
+    }
+
+    public function fetchSubscribedPlans() //fetch all plans a user is subscribed to
+    {
+        $user = JWTAuth::parseToken()->toUser(); 
+
+        $subscribed_plans = Subscription::where('user_id', $user->id)->get();
+
+        foreach($subscribed_plans as $subscribed_plan){
+            echo $subscribed_plan->plan->name;
+        }
+
     }
 
     private function userEmailExists($email)  //function to check if user email exists
@@ -184,3 +223,5 @@ class PlanController extends Controller
     }
 
 }
+
+

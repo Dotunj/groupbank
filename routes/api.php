@@ -26,8 +26,10 @@ Route::post('/user/add/card/{TnxRef}', 'CardController@addCard');
 Route::get('/user/cards', 'CardController@allCards');
 Route::delete('/user/card/delete/{id}', 'CardController@deleteCard');
 Route::get('/plans', 'PlanController@index');
+Route::get('/plans/subscribed', 'PlanController@fetchSubscribedPlans');
 Route::post('/plan/create', 'PlanController@create');
 Route::post('/plan/{plan}/register', 'PlanController@registerNewUser');
+Route::get('/plan/{plan}/users', 'PlanController@fetchAllSubscribedUsersToAPlan');
 Route::post('/plan/{plan}/users/add', 'PlanController@sendUserEmail');
 Route::post('/plan/{plan}/subscribe/{TnxRef}', 'PlanController@subscribeNewUserToPlan');
 
