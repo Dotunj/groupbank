@@ -88,9 +88,9 @@ class PaymentController extends Controller
 
         $result =json_decode($body,true);
 
-        $test = $this->addAccountNumber(3113379106, "011");
+        dd($this->addAccountNumber(3113379206, "011"));
 
-        return $test;
+        return $result;
     }
 
     public function addAccountNumber($acct_no, $bank_code)

@@ -24,16 +24,25 @@ class PlanController extends Controller
 
         $plans = Plan::where('user_id', $user->id)->latest()->get();
 
+        $subscribed_plans = Subscription::where('user_id', $user->id)->get();
+
+        $user_subscribed_plans = [];
+
+        //fetch all the plans the user is subscribed too
+        foreach($subscribed_plans as $subscribed_plan){
+            array_push($user_subscribed_plans, $subscribed_plan->plan);
+         }   
+
         $result = [
             'status'=>true,
             'message'=>'successfully retrieved plans',
             'data'=>$plans, 
+            'subscribed_plans'=>$user_subscribed_plans
         ];        
-
-        dd($plans->subscriptions);
 
         return response()->json($result, 200);
     }
+    
     public function create(Request $request)
     {
        $rules =  [
@@ -68,12 +77,12 @@ class PlanController extends Controller
        ]);
 
        //fetch user card 
-       $card_id = Card::where('user_id', $user->id)->first()->get(['id']);
+       $card = Card::where('user_id', $user->id)->first();
 
        $plan->subscription()->create([
           'user_id'=>$user->id,
           'plan_id'=>$plan->id,
-          'card_id'=>$card_id,       
+          'card_id'=>$card->id,       
        ]);
 
        $result = [
@@ -198,9 +207,13 @@ class PlanController extends Controller
 
         $subscribed_users = Subscription::where('plan_id', $plan->id)->get();
 
+        $final= [
+        ];
+
         foreach($subscribed_users as $subscription){
-            echo $subscription->user->email;
+           array_push($final, $subscription->user);
         }
+       dd($final);
     }
 
     public function fetchSubscribedPlans() //fetch all plans a user is subscribed to
@@ -208,6 +221,8 @@ class PlanController extends Controller
         $user = JWTAuth::parseToken()->toUser(); 
 
         $subscribed_plans = Subscription::where('user_id', $user->id)->get();
+
+
 
         foreach($subscribed_plans as $subscribed_plan){
             echo $subscribed_plan->plan->name;
