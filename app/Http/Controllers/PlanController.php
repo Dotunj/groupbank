@@ -22,22 +22,24 @@ class PlanController extends Controller
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
-        $plans = Plan::where('user_id', $user->id)->latest()->get();
+        $plans = Plan::with('subscription')->where('user_id', $user->id)->latest()->get(); //fetch all the plans that belongs to a user as well as subscribed plans
+
+        //dd($plans);
 
         $subscribed_plans = Subscription::where('user_id', $user->id)->get();
 
-        $user_subscribed_plans = [];
+        //dd($subscribed_plans);
 
         //fetch all the plans the user is subscribed too
-        foreach($subscribed_plans as $subscribed_plan){
-            array_push($user_subscribed_plans, $subscribed_plan->plan);
-         }   
+        // foreach($subscribed_plans as $subscribed_plan){
+        //     array_push($user_subscribed_plans, $subscribed_plan->plan);
+        //  }   
 
         $result = [
             'status'=>true,
             'message'=>'successfully retrieved plans',
             'data'=>$plans, 
-            'subscribed_plans'=>$user_subscribed_plans
+            // 'subscribed_plans'=>$user_subscribed_plans
         ];        
 
         return response()->json($result, 200);

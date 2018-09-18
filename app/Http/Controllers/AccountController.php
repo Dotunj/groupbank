@@ -68,6 +68,7 @@ class AccountController extends Controller
 
         $banks = $payment->fetchAllBanks(); //fetch all banks
 
+
         $result = [
             'status'=>true,
             'message'=> 'Retrieved all banks',
