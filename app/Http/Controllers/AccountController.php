@@ -10,6 +10,12 @@ use App\Http\Controllers\PaymentController as Payment;
 
 class AccountController extends Controller
 {
+    protected $payment;
+
+    public function __construct(Payment $payment) //pass the Payment class to the constructor
+    {
+        $this->payment = $payment;
+    }
 
     public function verifyAccountNumber(Request $request)
     {
@@ -17,9 +23,9 @@ class AccountController extends Controller
         
         $acct_no = $request->acct_no;
 
-        $payment = new Payment();
+        $result = $this->payment->addAccountNumber($acct_no, "$bank_code");
 
-        if($payment->addAccountNumber($acct_no, "$bank_code")) 
+        if($result) 
         {
            $acct_name = $result['data']['account_name'];
 
@@ -44,11 +50,15 @@ class AccountController extends Controller
     {
         $user = JWTAuth::parseToken()->toUser(); //fetch the associated user
 
+        $bank_code = $request->bank_code;
+
+        $bank_name = $this->payment->fetchBankName("$bank_code");
+
         $acct_details =[
-            'account_name'=>$request_account_name,
+            'account_name'=>$request->account_name,
             'account_no'=> $request->account_no,
-            'bank_name' => $request->bank_name,
-            'bank_code' => $request->bank_code
+            'bank_name' => $bank_name,
+            'bank_code' => $bank_code
         ];
 
         $acct = $user->accounts()->create($acct_details);
@@ -64,9 +74,8 @@ class AccountController extends Controller
 
     public function fetchAllBanks()
     {
-        $payment = new Payment();
 
-        $banks = $payment->fetchAllBanks(); //fetch all banks
+        $banks = $this->payment->fetchAllBanks(); //fetch all banks
 
 
         $result = [

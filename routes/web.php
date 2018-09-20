@@ -16,4 +16,4 @@ Route::get('/', function () {
 });
 Route::get('/plan/{plan}/register','PlanController@addMembersToPlanForm')->name('add.user.plan');
 Route::get('/test/payment', 'PlanController@test');
-Route::get('/test', 'PaymentController@fetchAllBanks');
+Route::get('/test', 'AccountController@verifyAccountNumber');

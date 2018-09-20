@@ -97,12 +97,6 @@ class PaymentController extends Controller
     {
         $result = array();
 
-      //  dd($bank_code);
-
-        //$acct_no = 3113379106;
-
-        //$bank_code = 011;
-
         $response = $this->client->request('GET', '/bank/resolve?account_number='. $acct_no .'&bank_code='.$bank_code);
 
         $body = $response->getBody();
@@ -110,5 +104,22 @@ class PaymentController extends Controller
         $result =json_decode($body,true);
 
         return $result; 
+    }
+
+    public function fetchBankName($bank_code)
+    {
+        $results = array();
+
+        $response = $this->client->request('GET', '/bank');
+
+        $body = $response->getBody();
+
+        $results =json_decode($body,true);
+
+        foreach($results['data'] as $result){
+            if($result['code'] === $bank_code){
+                return $result['name'];
+            }
+        }
     }
 }
