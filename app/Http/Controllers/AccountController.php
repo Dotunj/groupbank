@@ -54,14 +54,26 @@ class AccountController extends Controller
 
         $bank_name = $this->payment->fetchBankName("$bank_code");
 
+        $account_no = $request->account_no;
+
+        if(Account::where('account_no', $account_no)->exists()){
+            
+          $result = [
+            'status'=>true,
+            'message'=>'Account has already been added',
+          ];
+        
+          return response()->json($result, 200);
+        }
+
         $acct_details =[
             'account_name'=>$request->account_name,
-            'account_no'=> $request->account_no,
+            'account_no'=> $account_no,
             'bank_name' => $bank_name,
             'bank_code' => $bank_code
         ];
 
-        $acct = $user->accounts()->create($acct_details);
+        $acct = $user->accounts()->create($acct_details);  //store the user's account details
 
         $result = [
             'status'=>true,
@@ -84,7 +96,37 @@ class AccountController extends Controller
             'data'=> $banks
         ];
 
-        return response()->json($result, 200);
+       return response()->json($result, 200);
     
+   }
+
+   public function fetchUserAccounts()
+   {
+       $user = JWTAuth::parseToken()->toUser();
+
+       $user_accounts = $user->accounts; //fetch user accounts
+       
+       $result = [
+        'status'=>true,
+        'message'=> 'Retrieved all accounts',
+        'data'=> $user_accounts
+       ];
+
+       return response()->json($result, 200);
+   }
+
+   public function deleteAccount(Account $account)
+   {
+     $this->authorize('touch', $account);
+    
+     $account->delete();
+
+     $result = [
+        'status'=>true,
+        'message'=>'Account has been deleted',
+    ];
+
+     return response()->json($result, 200);
+
    }
 }

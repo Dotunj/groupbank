@@ -10,7 +10,7 @@ class Account extends Model
 
    use SoftDeletes;
 
-   protected $fiilable = [
+   protected $fillable = [
        'user_id',
        'account_name',
        'account_no',

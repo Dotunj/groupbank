@@ -25,6 +25,8 @@ Route::get('/user', 'UserController@fetchUser');
 Route::get('/banks', 'AccountController@fetchAllBanks');
 Route::post('/user/verify', 'AccountController@verifyAccountNumber');
 Route::post('/user/add/accountno/', 'AccountController@addAccount');
+Route::get('/user/accountno/all', 'AccountController@fetchUserAccounts');
+Route::delete('/user/accountno/delete', 'AccountController@deleteAccount');
 Route::post('/user/add/card/{TnxRef}', 'CardController@addCard');
 Route::get('/user/cards', 'CardController@allCards');
 Route::delete('/user/card/delete/{id}', 'CardController@deleteCard');
