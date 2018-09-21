@@ -22,7 +22,7 @@ class AccountPolicy
 
     public function touch(User $user, Account $account)
     {
-        return $user->id == $account->user_id; 
+        return $user->id === $account->user_id; 
     }
 
 }

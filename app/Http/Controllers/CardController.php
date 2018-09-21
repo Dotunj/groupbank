@@ -30,7 +30,6 @@ class CardController extends Controller
 
         $card_exists = Card::where('last_four', $last_four) //query to check if user card already exists
                             ->where('user_id', $user->id)
-                            ->whereNull('deleted_at')
                             ->exists();
          
         if($card_exists){
